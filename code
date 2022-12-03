@@ -1,0 +1,225 @@
+import pygame, sys
+from pygame.locals import*
+from random import randint
+
+patron_oculto=[[' ']*7 for x in range(7)]#1er tablero
+
+patron_oculto2=[[' ']*7 for x in range(7)]#2do tablero
+
+pygame.init()#-------------------------------------------------------------------------------
+#---COLORES---
+white=(255,255,255)
+black=(0,0,0)
+red=(255,0,0)
+green=(0,255,0)
+blue=(0,0,255)
+gray=(128, 128, 128)
+#---VENTANA---
+Ancho=1500
+Alto=1000 
+screen=pygame.display.set_mode((Ancho,Alto))
+fondo=pygame.image.load("mar.jpg").convert()
+pygame.display.set_caption('1ra opcion')
+#---Controlar los FPS---
+clock=pygame.time.Clock()
+
+
+class Casilla1(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image=pygame.image.load('gris.png').convert()
+        self.rect=self.image.get_rect()
+
+class Casilla2(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image=pygame.image.load('gris.png').convert()
+        self.rect=self.image.get_rect()
+    
+class Fallo1(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image=pygame.image.load('gris_nada.png').convert()
+        self.rect=self.image.get_rect()
+
+class Fallo2(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image=pygame.image.load('gris_nada.png').convert()
+        self.rect=self.image.get_rect()
+
+class Exito1(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image=pygame.image.load('gris_x.png').convert()
+        self.rect=self.image.get_rect()
+
+class Exito2(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image=pygame.image.load('gris_x.png').convert()
+        self.rect=self.image.get_rect()
+
+
+
+class Misil(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image=pygame.image.load('misil.jpg').convert()
+        #self.image.set_colorkey(white)
+        self.image=pygame.transform.scale(self.image,(30,30))
+        self.rect=self.image.get_rect()
+    def update(self):#Si tienen movimiento
+            #Posicion de mouse
+        mouse_position=pygame.mouse.get_pos()
+        mov_x=mouse_position[0]
+        mov_y=mouse_position[1]
+        misil.rect.x=mov_x
+        misil.rect.y=mov_y
+
+
+all_list=pygame.sprite.Group() #Detecta coliciones'Vacio
+all_sprite_list1=pygame.sprite.Group() #Cubre todo
+all_sprite_list2=pygame.sprite.Group() #Cubre todo
+nada_1=pygame.sprite.Group() #Fondo con nada
+nada_2=pygame.sprite.Group() #Fondo con nada
+barcos_1=pygame.sprite.Group() #Barcos
+barcos_2=pygame.sprite.Group() #Barcos
+
+
+def create_ships(tablero):
+    for ship in range(5):
+        ship_r, ship_cl=randint(0,5), randint(0,5)
+        while tablero[ship_r][ship_cl] =='X':
+            ship_r, ship_cl = randint(0, 5), randint(0, 5)
+        tablero[ship_r][ship_cl] = 'X'
+
+        
+
+def create_ships2(tablero2):
+    for ship2 in range(5):
+        ship_r, ship_cl=randint(0,5), randint(0,5)
+        while tablero2[ship_r][ship_cl] =='X':
+            ship_r, ship_cl = randint(0, 5), randint(0, 5)
+        tablero2[ship_r][ship_cl] = 'X'
+
+create_ships(patron_oculto)
+create_ships2(patron_oculto2)
+
+for y in range(200,1000-100,100):#Cambia las filas (-)
+    for x in range(50,700,100):#cambia las columnas 
+        fallo1=Fallo1()
+        fallo1.rect.x=x
+        fallo1.rect.y=y
+        nada_1.add(fallo1)
+        
+
+for y in range(200,1000-100,100):
+    for x in range(778,1500-50,100):
+        fallo2=Fallo2()
+        fallo2.rect.x=x
+        fallo2.rect.y=y
+        nada_2.add(fallo2)
+
+
+
+
+for y in range(200,1000-100,100):#Cambia las filas (-)
+    for x in range(50,700,100):#cambia las columnas 
+        casilla1=Casilla1()
+        casilla1.rect.x=x
+        casilla1.rect.y=y
+        all_sprite_list1.add(casilla1)
+        #all_list.add(casilla1)
+        
+for y in range(200,1000-100,100):
+    for x in range(778,1500-50,100):
+        casilla2=Casilla2()
+        casilla2.rect.x=x
+        casilla2.rect.y=y
+        all_sprite_list2.add(casilla2)
+        #all_list.add(casilla2)
+        
+misil=Misil()
+all_list.add(misil)
+#-------------------------------------------------texto permanente
+exito1=pygame.image.load('gris_x.png')
+exito_=pygame.transform.scale(exito1,(50,50))
+fallo1=pygame.image.load('gris_nada.png')
+fallo_=pygame.transform.scale(fallo1,(50,50))
+#-------------------------------------------------texto permanente
+
+#contador=0
+while True:
+    for event in pygame.event.get():
+        #print(event)
+        if event.type==pygame.QUIT:
+            sys.exit()
+        if event.type==pygame.MOUSEBUTTONDOWN:
+            #contador+=1
+            colision1=pygame.sprite.spritecollide(misil,all_sprite_list2,True)
+            colision2=pygame.sprite.spritecollide(misil,all_sprite_list1,True)
+
+    #if contador % 2==0:
+    #    misil.rect.x>750
+    #    misil.rect.y>500
+    #else:
+    #    misil.rect.x<751
+    #    misil.rect.y<501
+
+    screen.fill(white)#Color
+
+
+
+    nada_1.draw(screen)#3ra capa-jugador1
+    nada_2.draw(screen)#3ra capa-jugador2
+    barcos_1.draw(screen)#2da capa-jugador1
+    barcos_2.draw(screen)#2ra capa-jugador2
+    all_sprite_list1.draw(screen)#1ra capa-Jugador1
+    all_sprite_list2.draw(screen)#1ra capa-Jugador2
+
+    all_list.draw(screen)#mostrar misil
+    all_list.update()#Mover misil
+
+
+
+    
+    casilla00_1=screen.blit(pygame.image.load('gris_x.png'),(10,10))
+    casilla01_1=screen.blit(pygame.image.load('gris_nada.png'),(100,10))
+
+
+
+
+
+
+
+
+    #------------------------------------------------------------------------------------------Texto permanente
+    linea=pygame.draw.line(screen,black,(Ancho/2,150),(750,Alto-100),5) #LINEA QUE DIVIDE
+    font = pygame.font.SysFont("serif", 40) # Fuente
+    text = font.render("Juego de Battlehip", True, black) # Texto
+    centro_x = (Ancho // 2) - (text.get_width() // 2) # posicion text
+    centro_y = (50) - (text.get_height() // 2)
+    screen.blit(text, (centro_x, centro_y)) # ponerlo en pantalla
+    font_tabl=pygame.font.SysFont("serif", 35)
+    text_tabl1=font_tabl.render('Campo del jugador 1!',True,black)
+    tab1_x=(235)
+    tablero_y=(140)
+    screen.blit(text_tabl1,(tab1_x,tablero_y))
+    text_tabl2=font_tabl.render('Campo del jugador 2!',True,black)
+    tab2_x=(950)
+    screen.blit(text_tabl2,(tab2_x,tablero_y))
+        
+
+    font_estado=pygame.font.SysFont('serif',25)
+    text_exito=font_estado.render('= Le diste a un barco, tienes otra oporunidad.',True,black)
+    screen.blit(text_exito,(255,925))
+    exito=screen.blit(exito_,(200,915))
+    text_fallo=font_estado.render('= No le diste a ningún barco, le toca a tu rival.',True,black)
+    screen.blit(text_fallo,(855,925))
+    fallo=screen.blit(fallo_,(800,915))
+    #------------------------------------------------------------------------------------------Texto permanente
+    
+    pygame.display.update() #Actualiza la pantalla, solo si no pasa un argumento
+    pygame.display.flip() #Actualiza la superficie de la pantalla
+    clock.tick(30)
